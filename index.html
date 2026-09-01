@@ -1,342 +1,517 @@
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ementa Brasa de Miraflores - Garçom</title>
+    <title>Painel Cozinha - Brasa de Miraflores</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Oswald:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --branco-gelo: #f8f9fa; --vermelho-brasa: #bc0000; --marrom-escuro: #2c1e16; --verde-sucesso: #15803d; }
-        body { background-color: var(--branco-gelo); color: var(--marrom-escuro); font-family: 'Roboto', sans-serif; padding-bottom: 220px; }
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: #1a1a1a; color: white; padding: 16px 24px; border-radius: 8px; border-left: 6px solid var(--vermelho-brasa); box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.5s ease forwards; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .toast.success { border-left-color: #2ecc71; }
-        .toast.error { border-left-color: #e74c3c; }
-        .toast.warning { border-left-color: #f1c40f; }
-        .word-flowers { display: inline-flex; position: relative; font-family: 'Cinzel', serif; }
-        .letter-container { position: relative; display: inline-block; }
-        .flower { position: absolute; width: 8px; height: 8px; background: #ffb7c5; border-radius: 50%; opacity: 0; pointer-events: none; z-index: 10; bottom: -2px; left: 50%; transform: translateX(-50%) scale(0); animation: bloom 4s infinite ease-in-out; }
-        .flower::before, .flower::after { content: ''; position: absolute; width: 100%; height: 100%; background: inherit; border-radius: inherit; }
-        .flower::before { transform: rotate(45deg); box-shadow: 10px 0 0 #ffb7c5, -10px 0 0 #ffb7c5; }
-        .flower::after { transform: rotate(-45deg); box-shadow: 0 10px 0 #ffb7c5, 0 -10px 0 #ffb7c5; }
-        @keyframes bloom { 0% { transform: translateX(-50%) scale(0) rotate(0deg); opacity: 0; } 20% { transform: translateX(-50%) scale(1.2) rotate(45deg); opacity: 0.8; } 40% { transform: translateX(-50%) scale(1) rotate(90deg); opacity: 0.9; } 60% { transform: translateX(-50%) scale(1) rotate(135deg); opacity: 0.9; } 80% { transform: translateX(-50%) scale(1.2) rotate(180deg); opacity: 0.8; } 100% { transform: translateX(-50%) scale(0) rotate(225deg); opacity: 0; } }
-        .f1 { left: -2px; bottom: 10px; animation-delay: 0.5s; background: #ff80ab; }
-        .f2 { left: 50%; bottom: -5px; animation-delay: 1.2s; }
-        .f3 { left: 100%; bottom: 15px; animation-delay: 2.5s; background: #f48fb1; }
-        .main-title { color: var(--vermelho-brasa); font-family: 'Cinzel', serif; letter-spacing: 2px; }
-        .category-title { color: var(--vermelho-brasa); font-family: 'Oswald', sans-serif; font-size: 1.7rem; margin-top: 35px; margin-bottom: 20px; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 15px; }
-        .category-title::after { content: ''; flex-grow: 1; height: 2px; background-color: #e2e8f0; }
-        .red-line { border-top: 2px solid var(--vermelho-brasa); width: 100%; margin: 10px 0; }
-        .item-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; padding: 14px 18px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s ease-in-out; position: relative; overflow: hidden; }
-        .item-container:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: var(--vermelho-brasa); }
-        .item-container::before { content: '+'; position: absolute; left: -30px; color: var(--vermelho-brasa); font-weight: bold; font-size: 1.2rem; transition: all 0.2s ease-in-out; }
-        .item-container:hover::before { left: 15px; }
-        .item-container:hover .item-name { transform: translateX(18px); }
-        .item-name { font-weight: 700; text-transform: uppercase; font-size: 0.95rem; transition: all 0.2s ease-in-out; }
-        .item-price { font-weight: 700; font-size: 1rem; color: var(--vermelho-brasa); }
-        .order-bar { background: rgba(255, 255, 255, 0.98); border-top: 1px solid #e2e8f0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
-        .btn-cozinha { background-color: var(--vermelho-brasa); color: white; }
-        .btn-fechar { background-color: var(--marrom-escuro); color: white; }
-        .cart-tag { display: inline-flex; align-items: center; background: #ffffff; padding: 6px 12px; border-radius: 20px; margin: 4px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .cart-tag.enviado { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
-        .remove-x { color: #94a3b8; margin-left: 8px; cursor: pointer; font-size: 14px; font-weight: 900; }
-        .cart-tag:not(.enviado):hover { border-color: var(--vermelho-brasa); }
-        .cart-tag:not(.enviado):hover .remove-x { color: var(--vermelho-brasa); }
-        .cart-tag.enviado:hover .remove-x { color: #ef4444; }
-        .input-group input { border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .input-group input:focus { border-color: var(--vermelho-brasa); outline: none; }
-        .mesa-badge { padding: 4px 12px; background: #e2e8f0; color: #475569; border-radius: 12px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .mesa-badge.ativa { background: var(--vermelho-brasa); color: white; }
+        body { background-color: #0a0a0a; color: #e5e7eb; overflow: hidden; font-family: 'Roboto', sans-serif;}
+        .grid-cozinha { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
+        .card-pedido { background: #1a1a1a; border: 1px solid #333; border-radius: 16px; overflow: hidden; position: relative; transition: all 0.3s ease; }
+        
+        .status-pendente { border-top: 6px solid #f59e0b; }
+        .status-preparo { border-top: 6px solid #3b82f6; }
+        .status-pronto { border-top: 6px solid #a855f7; } 
+        .status-finalizado { border-top: 6px solid #22c55e; }
+        
+        .new-order-pulse { animation: shadow-pulse 1.5s infinite; }
+        @keyframes shadow-pulse { 0% { box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.4); } 100% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); } }
+        
+        header { height: 75px; }
+        main { height: calc(100vh - 75px); }
+
+        #dashboard-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 50; backdrop-filter: blur(8px); overflow-y: auto; padding: 20px 0; }
+        .dashboard-content { background: #121212; border: 1px solid #333; max-width: 1000px; margin: 0 auto; border-radius: 12px; display: flex; flex-direction: column; }
     </style>
 </head>
-<body>
+<body class="flex flex-col h-screen">
 
-    <div id="toast-container" class="toast-container"></div>
-
-    <header class="max-w-3xl mx-auto pt-10 px-6 text-center">
-        <h1 class="text-4xl md:text-5xl main-title font-bold mb-3">
-            <span class="word-flowers">
-                <span class="letter-container">B<div class="flower f1"></div></span>
-                <span class="letter-container">R<div class="flower f2"></div></span>
-                <span class="letter-container">A<div class="flower f3"></div></span>
-                <span class="letter-container">S<div class="flower f1"></div></span>
-                <span class="letter-container">A<div class="flower f2"></div></span>
-            </span> DE 
-            <span class="word-flowers">
-                <span class="letter-container">M<div class="flower f1"></div></span>
-                <span class="letter-container">I<div class="flower f2"></div></span>
-                <span class="letter-container">R<div class="flower f3"></div></span>
-                <span class="letter-container">A<div class="flower f1"></div></span>
-                <span class="letter-container">F<div class="flower f2"></div></span>
-                <span class="letter-container">L<div class="flower f3"></div></span>
-                <span class="letter-container">O<div class="flower f1"></div></span>
-                <span class="letter-container">R<div class="flower f2"></div></span>
-                <span class="letter-container">E<div class="flower f3"></div></span>
-                <span class="letter-container">S<div class="flower f1"></div></span>
-            </span>
-        </h1>
-        <div class="red-line"></div>
-        <p class="text-[13px] tracking-[0.3em] font-bold text-zinc-500 py-2 uppercase">Especialidades na Brasa desde 2004</p>
-        <div class="red-line"></div>
+    <header class="bg-zinc-900 px-6 py-3 border-b border-zinc-800 flex justify-between items-center shadow-lg z-10">
+        <div class="flex items-center gap-6">
+            <h1 class="text-2xl font-black text-amber-500 uppercase tracking-tighter">COZINHA</h1>
+            <span id="contador-pedidos" class="bg-zinc-800 text-amber-500 px-3 py-1 rounded border border-zinc-700 text-lg font-bold">0 ATIVAS</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <button onclick="abrirDashboard()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded font-bold uppercase transition flex items-center gap-2">
+                <i class="fas fa-chart-line"></i> Dashboard Vendas
+            </button>
+            <div class="flex flex-col text-right ml-4 border-l border-zinc-700 pl-6">
+                <span class="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Faturamento Hoje</span>
+                <span id="faturamento-hoje" class="text-2xl text-green-500 font-black">0,00€</span>
+            </div>
+            <div id="status-conexao" class="text-xs text-gray-500 uppercase font-bold text-right ml-4 w-24">● Sincronizado</div>
+        </div>
     </header>
 
-    <section class="max-w-4xl mx-auto px-6 mt-6">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex flex-col md:flex-row gap-3">
-                <input type="number" id="ms" placeholder="Nº MESA" class="w-full md:w-1/3 p-3 rounded-lg uppercase text-sm font-bold bg-slate-50">
-                <input type="text" id="cli" placeholder="NOME DO CLIENTE (Opcional)" class="w-full md:w-2/3 p-3 rounded-lg uppercase text-sm font-bold bg-slate-50">
-                <button onclick="abrirMesa()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-lg font-bold text-sm transition-colors whitespace-nowrap">
-                    ABRIR MESA
-                </button>
-            </div>
-            <div class="mt-3 flex flex-wrap gap-2 items-center" id="mesas-abertas-container">
-                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Mesas Abertas:</span>
-            </div>
-        </div>
-    </section>
+    <main class="overflow-y-auto bg-black relative">
+        <div class="grid-cozinha" id="pedidos-container"></div>
+    </main>
 
-    <main class="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-x-10 pb-10" id="main-menu"></main>
-
-    <div class="fixed bottom-0 left-0 right-0 p-4 order-bar z-50">
-        <div class="max-w-5xl mx-auto">
-            <div id="resumo-carrinho" class="flex flex-wrap gap-1 mb-3 max-h-24 overflow-y-auto p-1">
-                <span class="text-[11px] text-zinc-400 italic font-medium">Abra uma mesa para começar a registar itens.</span>
+    <!-- MODAL DASHBOARD -->
+    <div id="dashboard-modal">
+        <div class="dashboard-content shadow-2xl">
+            <div class="flex justify-between items-center p-6 border-b border-zinc-800">
+                <h2 class="text-2xl font-black text-white"><i class="fas fa-chart-pie text-blue-500 mr-2"></i> Relatório de Faturamento</h2>
+                <div class="flex items-center gap-4">
+                    <button onclick="baixarRelatorio()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold uppercase text-xs transition flex items-center gap-2">
+                        <i class="fas fa-file-excel"></i> Exportar
+                    </button>
+                    <button onclick="fecharDashboard()" class="text-zinc-500 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row justify-between items-center border-t border-slate-200 pt-3 gap-4">
-                <div class="text-center sm:text-left w-full sm:w-auto">
-                    <p class="text-[10px] text-zinc-400 uppercase font-bold tracking-widest mb-1">
-                        Mesa <span id="rodape-mesa" class="text-vermelho-brasa text-sm">-</span> | Total da Conta
-                    </p>
-                    <p id="total" class="text-3xl font-bold text-marrom-escuro">0,00€</p>
+            <div class="p-6 bg-zinc-900 flex gap-4">
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Data Início</label>
+                    <input type="date" id="data-inicio" class="w-full bg-black border border-zinc-700 rounded p-3 text-white outline-none focus:border-blue-500" onchange="renderDashboard()">
                 </div>
-                
-                <div class="flex w-full sm:w-auto gap-2">
-                    <button onclick="enviarCozinha()" id="btn-cozinha" class="btn-cozinha flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all flex items-center justify-center">
-                        Enviar
-                    </button>
-                    <button onclick="fecharConta()" id="btn-fechar" class="btn-fechar flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all">
-                        Cobrar
-                    </button>
-                    <button onclick="excluirMesa()" id="btn-excluir" class="bg-red-600 hover:bg-red-500 text-white flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all">
-                        Excluir
-                    </button>
+                <div class="flex-1">
+                    <label class="block text-xs font-bold text-zinc-400 uppercase mb-1">Data Fim</label>
+                    <input type="date" id="data-fim" class="w-full bg-black border border-zinc-700 rounded p-3 text-white outline-none focus:border-blue-500" onchange="renderDashboard()">
+                </div>
+            </div>
+
+            <div class="flex justify-around p-6 bg-zinc-800/50">
+                <div class="text-center">
+                    <p class="text-sm text-zinc-400 font-bold uppercase mb-1">Total do Período</p>
+                    <p id="dash-total-periodo" class="text-4xl text-green-400 font-black">0,00€</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm text-zinc-400 font-bold uppercase mb-1">Qtd de Mesas</p>
+                    <p id="dash-qtd-mesas" class="text-4xl text-blue-400 font-black">0</p>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                <div class="bg-black border border-zinc-800 p-4 rounded-xl flex flex-col">
+                    <h3 class="text-center text-zinc-400 font-bold mb-4 uppercase text-sm">Faturamento Diário</h3>
+                    <div class="relative w-full h-48"> 
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-black border border-zinc-800 p-4 rounded-xl flex flex-col items-center">
+                    <h3 class="text-center text-zinc-400 font-bold mb-4 uppercase text-sm">Distribuição Mensal</h3>
+                    <div class="relative w-48 h-48"> 
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA COM BOTÃO DE REIMPRESSÃO -->
+            <div class="p-6">
+                <h3 class="text-zinc-400 font-bold mb-4 uppercase text-sm border-b border-zinc-800 pb-2">Histórico do Período</h3>
+                <div class="max-h-64 overflow-y-auto pr-2">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-zinc-500 uppercase text-[10px] border-b border-zinc-800">
+                                <th class="pb-2">Data e Hora</th>
+                                <th class="pb-2">Mesa</th>
+                                <th class="pb-2 text-right">Valor Registado</th>
+                                <th class="pb-2 text-center w-24">2ª Via</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-tabela-corpo" class="text-sm">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx0Pe6FPM56dQE3axToTZWYnrCbIlG5-lTJS4QgcrlupRYFLmU0NlnfvyrRWaz4-s7z/exec"; 
+    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-        function mostrarMensagem(texto, tipo = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${tipo}`;
-            let icon = "🔥"; if(tipo === 'error') icon = "❌"; if(tipo === 'warning') icon = "⚠️";
-            toast.innerHTML = `<span>${icon}</span> <span>${texto}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.animation = "slideIn 0.5s ease reverse forwards"; setTimeout(() => toast.remove(), 500); }, 4000);
+   <script>
+    // ======= COLOQUE AQUI A SUA URL DO APPS SCRIPT =======
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx0Pe6FPM56dQE3axToTZWYnrCbIlG5-lTJS4QgcrlupRYFLmU0NlnfvyrRWaz4-s7z/exec";
+    
+    let listaPedidos = [];
+    let historicoVendas = [];
+    let filtradosGlobais = []; 
+    let barChartInstance = null;
+    let pieChartInstance = null;
+
+    function renderizarCards() {
+        const container = document.getElementById('pedidos-container');
+        container.innerHTML = '';
+        
+        if (listaPedidos.length === 0) {
+            container.innerHTML = `<div class="col-span-full text-center py-20 text-zinc-600 font-bold uppercase tracking-widest">Nenhuma mesa ativa na cozinha</div>`;
         }
 
-        const ementa = [
-            { cat: "Entradas", colSpan: 2, itens: [
-                {n: "Sopa de Legumes", p: 1.80}, {n: "Chouriço Assado na Brasa", p: 4.50},
-                {n: "Croquetes de Carne", p: 3.00}, {n: "Pastéis de Bacalhau", p: 3.00},
-                {n: "Chamuças (2 Unid.)", p: 3.00}, {n: "Sticks de Mozarella (5 Unid.)", p: 3.50},
-                {n: "Nuggets de Frango (5 Unid.)", p: 3.00}, {n: "Aros de Cebola (10 Unid.)", p: 3.00}
-            ]},
-            { cat: "Peixe na Brasa", colSpan: 1, itens: [
-                {n: "Salmão", p: 12.00}, {n: "Dourada", p: 12.00},
-                {n: "Robalo", p: 12.00}, {n: "Peixe-Espada", p: 12.00},
-                {n: "Espetada Camarão c/ Abacaxi", p: 13.50}, {n: "Choco Frito", p: 9.50},
-                {n: "Sardinhas", p: 12.00}
-            ]},
-            { cat: "Carne na Brasa", colSpan: 1, itens: [
-                {n: "1/2 Frango da Guia", p: 8.00}, {n: "Mista da Casa", p: 9.00},
-                {n: "Entremeada", p: 8.00}, {n: "Lombo de Porco", p: 8.00},
-                {n: "1/2 Piano de Entrecosto", p: 9.00}, {n: "Espetada Mista", p: 9.00},
-                {n: "Espetada de Frango", p: 9.00}, {n: "Picanha c/s Alho", p: 9.50},
-                {n: "Secretos de Porco Preto", p: 9.50}, {n: "Costeleta de Novilho", p: 12.00},
-                {n: "Picanha da América do Sul", p: 13.50}, {n: "Salsichas", p: 8.00},
-                {n: "Alheira com Ovo", p: 8.00}, {n: "Bife de Perú", p: 8.50},
-                {n: "Panados de Perú", p: 8.50}, {n: "Alheira de Lamego c/Ovo", p: 8.50},
-                {n: "Espetada de Novilho", p: 12.00}, {n: "Hambúrguer no Prato", p: 9.00},
-                {n: "Bife de Novilho", p: 10.00}, {n: "Bife da Vazia", p: 12.00}
-            ]},
-            { cat: "Vegetariano", colSpan: 1, itens: [
-                {n: "Panado Vegan", p: 7.50}, {n: "Salsichas Vegan", p: 12.00},
-                {n: "Omelete", p: 7.50}, {n: "Hambúrguer Vegan no Prato", p: 8.50},
-                {n: "Arroz de Legumes", p: 8.00}
-            ]},
-            { cat: "No Pão", colSpan: 1, itens: [
-                {n: "Hambúrguer Clássico", p: 8.50}, {n: "Hambúrguer à Casa", p: 9.50},
-                {n: "Hambúrguer Egg", p: 10.00}, {n: "Bifana de Porco/Perú", p: 4.50},
-                {n: "Prego de Novilho", p: 5.50}
-            ]},
-            { cat: "Acompanhamentos", colSpan: 1, itens: [
-                {n: "Arroz Branco", p: 1.50}, {n: "Batata Frita", p: 2.70},
-                {n: "Feijão Preto", p: 2.00}, {n: "Ovo Estrelado", p: 1.00},
-                {n: "Legumes Cozidos", p: 3.50}, {n: "Salada Mista", p: 1.80},
-                {n: "Salada de Tomate", p: 2.00}, {n: "Salada Vinagrete", p: 2.00},
-                {n: "Brócolos Cozidos", p: 3.50}
-            ]},
-            { cat: "Sobremesas", colSpan: 1, itens: [
-                {n: "Pudim Flan", p: 2.50}, {n: "Doce da Casa", p: 2.50},
-                {n: "Mousse de Chocolate", p: 3.00}, {n: "Mousse de Oreo", p: 2.50},
-                {n: "Grom Gelato Italiano", p: 3.95}, {n: "Abacaxi", p: 3.00},
-                {n: "Melão", p: 3.00}, {n: "Manga", p: 3.50}, {n: "Bolo de Bolacha", p: 3.50},
-                {n: "Bolo Brigadeiro", p: 3.50}, {n: "Bolo de Coco", p: 3.50},
-                {n: "Cheesecake", p: 3.50}
-            ]}
-        ];
-
-        let mesas = JSON.parse(localStorage.getItem('brasa_mesas')) || {};
-        let mesaAtiva = "";
-
-        function salvarMesas() { localStorage.setItem('brasa_mesas', JSON.stringify(mesas)); renderizarMesasAbertas(); }
-
-        function render() {
-            const menu = document.getElementById('main-menu');
-            menu.innerHTML = ""; 
-            ementa.forEach(s => {
-                const colClass = s.colSpan === 2 ? 'md:col-span-2' : 'md:col-span-1';
-                const gridInterno = s.colSpan === 2 ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6' : '';
-                const section = document.createElement('div');
-                section.className = colClass;
-                section.innerHTML = `<h2 class="category-title">${s.cat}</h2><div class="${gridInterno} mb-4">${s.itens.map(i => `<div class="item-container" onclick="add('${i.n}', ${i.p})"><span class="item-name">${i.n}</span><span class="item-price">${i.p.toFixed(2).replace('.', ',')}€</span></div>`).join('')}</div>`;
-                menu.appendChild(section);
-            });
-            renderizarMesasAbertas();
-            atualizarUI();
-        }
-
-        function abrirMesa(numMesa = null) {
-            const inputNum = document.getElementById('ms');
-            const inputCli = document.getElementById('cli');
-            let ms = numMesa; let isManualClick = false;
-
-            if (!ms) { ms = inputNum.value.trim(); isManualClick = true; }
-            if(!ms) return mostrarMensagem("Introduza o nº da mesa.", "warning");
-
-            if (mesas[ms]) {
-                const novoNome = inputCli.value.trim();
-                const nomeAtual = mesas[ms].cliente || "";
-                if (isManualClick && novoNome !== "" && novoNome !== nomeAtual) {
-                    const querMudar = confirm(`⚠️ A Mesa ${ms} já está registada como "${nomeAtual || 'Sem Nome'}".\nTem certeza que quer trocar o nome para "${novoNome}"?`);
-                    if (querMudar) { mesas[ms].cliente = novoNome; mostrarMensagem(`Nome da Mesa ${ms} atualizado!`, "success"); }
-                } else if (!isManualClick) { mostrarMensagem(`Mesa ${ms} selecionada!`, "success"); }
-                inputNum.value = ms; inputCli.value = mesas[ms].cliente || "";
-            } else {
-                const cli = inputCli.value.trim(); mesas[ms] = { cliente: cli, itens: [] }; inputNum.value = ms;
-                mostrarMensagem(`✅ Mesa ${ms} nova criada!`, "success");
-            }
-            mesaAtiva = ms; salvarMesas(); atualizarUI();
-        }
-
-        function renderizarMesasAbertas() {
-            const container = document.getElementById('mesas-abertas-container');
-            const tit = `<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mesas Ativas:</span>`;
-            const chavesMesas = Object.keys(mesas);
-            if(chavesMesas.length === 0) { container.innerHTML = tit + `<span class="text-xs text-slate-300 italic">Nenhuma</span>`; return; }
-            const badges = chavesMesas.map(m => {
-                const nomeCli = mesas[m].cliente ? ` - ${mesas[m].cliente}` : '';
-                return `<div class="mesa-badge ${m === mesaAtiva ? 'ativa' : ''}" onclick="abrirMesa('${m}')">Mesa ${m}${nomeCli}</div>`;
-            }).join('');
-            container.innerHTML = tit + badges;
-        }
-
-        function add(n, p) {
-            if(!mesaAtiva) return mostrarMensagem("Por favor, abra uma mesa primeiro.", "warning");
-            mesas[mesaAtiva].itens.push({ id: Date.now() + Math.random(), n, p, enviado: false });
-            salvarMesas(); atualizarUI(); mostrarMensagem(`${n} adicionado!`, 'success');
-        }
-
-        async function removerItem(id) {
-            if(!mesaAtiva || !mesas[mesaAtiva]) return;
-            const item = mesas[mesaAtiva].itens.find(i => i.id === id);
-            if (!item) return;
-
-            if (item.enviado) {
-                const confirmacao = confirm(`⚠️ DESEJA REALMENTE EXCLUIR ESTE ITEM?\n\nItem: ${item.n}\nValor: ${item.p.toFixed(2)}€\n\nIsso irá atualizar o pedido e avisar a cozinha.`);
-                if (!confirmacao) return;
-
-                try {
-                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "remover_item", mesa: mesaAtiva, item_id: id }) });
-                    mesas[mesaAtiva].itens = mesas[mesaAtiva].itens.filter(i => i.id !== id);
-                    salvarMesas(); atualizarUI(); mostrarMensagem(`🗑️ Item cancelado com sucesso!`, "success");
-                } catch (error) { mostrarMensagem("Erro ao cancelar item no servidor.", "error"); }
-            } else {
-                mesas[mesaAtiva].itens = mesas[mesaAtiva].itens.filter(i => i.id !== id);
-                salvarMesas(); atualizarUI();
-            }
-        }
-
-        function atualizarUI() {
-            const resumo = document.getElementById('resumo-carrinho'); const rodapeMesa = document.getElementById('rodape-mesa'); const totalE = document.getElementById('total');
-            if(!mesaAtiva || !mesas[mesaAtiva]) { resumo.innerHTML = '<span class="text-[11px] text-zinc-400 italic font-medium">Selecione uma mesa.</span>'; rodapeMesa.innerText = "-"; totalE.innerText = "0,00€"; return; }
-            const mesa = mesas[mesaAtiva]; rodapeMesa.innerText = mesaAtiva;
-            const totalVal = mesa.itens.reduce((acc, curr) => acc + curr.p, 0); totalE.innerText = totalVal.toFixed(2).replace('.', ',') + "€";
+        listaPedidos.forEach((pedido) => {
+            const card = document.createElement('div');
+            const isPendente = pedido.status === 'Pendente';
+            const isEmPreparo = pedido.status === 'Em Preparo';
+            const isPronto = pedido.status === 'Pronto';
+            const isFinalizado = pedido.status === 'Finalizado';
             
-            if(mesa.itens.length === 0) { resumo.innerHTML = '<span class="text-[11px] text-zinc-400 italic font-medium">Mesa vazia.</span>'; } 
-            else {
-                resumo.innerHTML = mesa.itens.map(item => {
-                    if(item.enviado) { return `<div class="cart-tag enviado">${item.n} <span class="ml-1 text-verde-sucesso">✓</span> <span class="remove-x ml-1" title="Excluir Item" onclick="removerItem(${item.id})">✖</span></div>`; } 
-                    else { return `<div class="cart-tag">${item.n} <span class="remove-x" title="Remover" onclick="removerItem(${item.id})">✖</span></div>`; }
-                }).join('');
+            let statusClass = ''; 
+            if(isPendente) statusClass = 'status-pendente new-order-pulse';
+            else if(isEmPreparo) statusClass = 'status-preparo';
+            else if(isPronto) statusClass = 'status-pronto';
+            else if(isFinalizado) statusClass = 'status-finalizado';
+
+            card.className = `card-pedido ${statusClass} shadow-2xl`;
+            
+            let badgeText = pedido.status.toUpperCase();
+            let badgeColor = isFinalizado ? 'text-green-500' : (isPendente ? 'text-amber-500' : (isPronto ? 'text-purple-400' : 'text-blue-500'));
+
+            card.innerHTML = `
+                <div class="p-4 bg-zinc-800/50 flex justify-between items-start">
+                    <div>
+                        <span class="text-xs uppercase font-bold ${badgeColor}">MESA ${pedido.mesa} - ${badgeText}</span>
+                        <h2 class="text-lg font-bold">${pedido.cliente || 'Sem Nome'}</h2>
+                    </div>
+                    <span class="text-xs text-gray-500 font-mono">${pedido.hora}</span>
+                </div>
+                
+                <div class="p-4 space-y-3 min-h-[120px]">
+                    ${pedido.itens.map(item => {
+                        if (item.cancelado) {
+                            return `
+                            <div class="flex justify-between border-b border-zinc-800 pb-2 bg-red-900/20 p-2 rounded border border-red-800 opacity-60">
+                                <span class="font-medium text-red-500 line-through">1x ${item.nome} (CANCELADO)</span>
+                            </div>`;
+                        } else {
+                            return `
+                            <div class="flex justify-between border-b border-zinc-800 pb-2 ${item.novo ? 'bg-amber-900/30 p-2 rounded border border-amber-600 animate-pulse' : ''}">
+                                <span class="font-medium ${item.novo ? 'text-amber-400 font-black' : 'text-gray-200'}">
+                                    1x ${item.nome} 
+                                    ${item.novo ? '<span class="ml-2 bg-amber-500 text-black text-[9px] px-1.5 py-0.5 rounded font-black tracking-widest uppercase shadow-lg">Acrescentado</span>' : ''}
+                                </span>
+                            </div>`;
+                        }
+                    }).join('')}
+                </div>
+
+                <div class="p-4 bg-zinc-900 flex flex-col gap-2">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-400 uppercase">Total da Mesa</span>
+                        <span class="font-bold text-white">${parseFloat(pedido.total).toFixed(2)}€</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-2">
+                        ${isPendente ? 
+                            `<button onclick="alterarStatusServidor('${pedido.mesa}', 'Em Preparo')" class="bg-amber-600 hover:bg-amber-500 text-black font-black py-3 rounded-lg transition w-full">ACEITAR ITENS</button>` 
+                            : ''
+                        }
+                        ${isEmPreparo ? 
+                            `<button onclick="alterarStatusServidor('${pedido.mesa}', 'Pronto')" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-lg transition w-full">MARCAR COMO PRONTO</button>` 
+                            : ''
+                        }
+                        ${isPronto ? 
+                            `<button disabled class="bg-purple-900/30 text-purple-400 border border-purple-800 font-black py-3 rounded-lg cursor-not-allowed w-full">AGUARDANDO CONTA</button>` 
+                            : ''
+                        }
+                        ${isFinalizado ? 
+                            `<button onclick="imprimirEArquivar('${pedido.mesa}')" class="bg-green-600 hover:bg-green-500 text-white font-black py-3 rounded-lg transition w-full flex justify-center items-center gap-2">
+                                <i class="fas fa-print"></i> IMPRIMIR E LIMPAR
+                            </button>`
+                            : ''
+                        }
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        
+        document.getElementById('contador-pedidos').innerText = `${listaPedidos.length} ATIVAS`;
+    }
+
+    async function buscarPedidosDoServidor() {
+        const statusIcon = document.getElementById('status-conexao');
+        try {
+            statusIcon.innerText = "● Atualizando...";
+            const response = await fetch(URL_APPS_SCRIPT);
+            const dados = await response.json();
+            
+            let tocarSom = false;
+            const pendentesAgora = dados.pedidos.filter(p => p.status === 'Pendente').length;
+            const pendentesAntes = listaPedidos.filter(p => p.status === 'Pendente').length;
+            
+            if (pendentesAgora > pendentesAntes) {
+                tocarSom = true;
+            } else {
+                dados.pedidos.forEach(pNovo => {
+                    if (pNovo.status === 'Pendente') {
+                        const pAntigo = listaPedidos.find(p => p.mesa === pNovo.mesa);
+                        if (pAntigo && pAntigo.status !== 'Pendente') tocarSom = true;
+                    }
+                });
+            }
+
+            if (tocarSom) {
+                const audio = document.getElementById('alert-sound');
+                audio.currentTime = 0; 
+                audio.play().catch(() => {});
+            }
+            
+            listaPedidos = dados.pedidos;
+            historicoVendas = dados.historico || [];
+            
+            document.getElementById('faturamento-hoje').innerText = parseFloat(dados.faturamento).toFixed(2).replace('.', ',') + '€';
+            
+            renderizarCards();
+            statusIcon.innerText = "● Sincronizado";
+            statusIcon.className = "text-xs text-gray-500 uppercase font-bold text-right w-24";
+        } catch (error) {
+            statusIcon.innerText = "● Erro";
+            statusIcon.className = "text-xs text-red-500 uppercase font-bold text-right w-24";
+        }
+    }
+
+    async function alterarStatusServidor(mesa, novoStatus) {
+        const pedidoIndex = listaPedidos.findIndex(p => p.mesa == mesa);
+        if (pedidoIndex !== -1) {
+            listaPedidos[pedidoIndex].status = novoStatus;
+            if (novoStatus === 'Em Preparo') listaPedidos[pedidoIndex].itens.forEach(i => delete i.novo);
+            renderizarCards(); 
+        }
+
+        try {
+            await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "status_cozinha", mesa: mesa, status: novoStatus }) });
+        } catch (error) { console.error(error); }
+    }
+
+    async function imprimirEArquivar(mesaStr) {
+        const p = listaPedidos.find(ped => ped.mesa == mesaStr);
+        if(!p) return;
+
+        listaPedidos = listaPedidos.filter(ped => ped.mesa != mesaStr);
+        renderizarCards();
+
+        let layout = `
+==============================
+     BRASA DE MIRAFLORES
+     CUPOM DE FECHAMENTO
+==============================
+MESA: ${p.mesa}
+CLIENTE: ${p.cliente || '-'}
+DATA/HORA: ${new Date().toLocaleTimeString()}
+------------------------------
+ITENS CONSUMIDOS:
+${p.itens.map(i => {
+    if(i.cancelado) return ''; 
+    return `- 1x ${i.nome}`;
+}).filter(i => i !== '').join('\n')}
+------------------------------
+TOTAL A PAGAR: ${parseFloat(p.total).toFixed(2)} EUR
+==============================`;
+        
+        await alterarStatusServidor(p.mesa, 'Arquivado');
+        
+        const win = window.open('', '', 'width=300,height=600');
+        win.document.write(`<pre style="font-family: monospace; font-size: 14px; padding:20px;">${layout}</pre>`);
+        win.print();
+        win.close();
+    }
+
+    // =====================================
+    // FUNÇÕES DO DASHBOARD (PDF/CSV e 2ª Via)
+    // =====================================
+    function parseDateData(str) {
+        const partes = str.split(' ')[0].split('/');
+        return new Date(`${partes[2]}-${partes[1]}-${partes[0]}T00:00:00`);
+    }
+
+    function abrirDashboard() {
+        document.getElementById('dashboard-modal').style.display = 'block';
+        
+        let dataInicio = "";
+        let dataFim = "";
+
+        if (historicoVendas && historicoVendas.length > 0) {
+            let datas = historicoVendas.map(v => parseDateData(v.data));
+            datas = datas.filter(d => !isNaN(d.getTime())); 
+
+            if (datas.length > 0) {
+                let minDate = new Date(Math.min(...datas));
+                let maxDate = new Date(Math.max(...datas));
+                
+                const yyyyMin = minDate.getFullYear();
+                const mmMin = String(minDate.getMonth() + 1).padStart(2, '0');
+                const ddMin = String(minDate.getDate()).padStart(2, '0');
+                dataInicio = `${yyyyMin}-${mmMin}-${ddMin}`;
+
+                const yyyyMax = maxDate.getFullYear();
+                const mmMax = String(maxDate.getMonth() + 1).padStart(2, '0');
+                const ddMax = String(maxDate.getDate()).padStart(2, '0');
+                dataFim = `${yyyyMax}-${mmMax}-${ddMax}`;
             }
         }
 
-        async function enviarCozinha() {
-            if(!mesaAtiva || !mesas[mesaAtiva]) return mostrarMensagem("Nenhuma mesa aberta.", "warning");
-            const mesa = mesas[mesaAtiva]; const itensNaoEnviados = mesa.itens.filter(i => !i.enviado);
-            if(itensNaoEnviados.length === 0) return mostrarMensagem("Não há itens novos para enviar à cozinha.", "warning");
-
-            const btn = document.getElementById('btn-cozinha'); btn.disabled = true;
-            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
-
-            const dadosPedido = { action: "adicionar", cliente: mesa.cliente, mesa: mesaAtiva, itens: itensNaoEnviados.map(i => ({ id: i.id, nome: i.n, preco: i.p })), total: itensNaoEnviados.reduce((acc, curr) => acc + curr.p, 0) };
-
-            try {
-                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(dadosPedido) });
-                mesa.itens.forEach(i => i.enviado = true); salvarMesas(); atualizarUI(); mostrarMensagem("🔥 ITENS ENVIADOS PARA A COZINHA!", "success");
-            } catch (error) { mostrarMensagem("Erro de conexão.", "error"); } 
-            finally { btn.disabled = false; btn.innerHTML = "Enviar"; }
+        if (!dataInicio || !dataFim) {
+            const hoje = new Date();
+            const yyyy = hoje.getFullYear();
+            const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoje.getDate()).padStart(2, '0');
+            dataInicio = `${yyyy}-${mm}-${dd}`;
+            dataFim = `${yyyy}-${mm}-${dd}`;
         }
 
-        async function fecharConta() {
-            if(!mesaAtiva || !mesas[mesaAtiva]) return;
-            const total = document.getElementById('total').innerText;
-            const confirmacao = confirm(`Deseja FECHAR A CONTA da Mesa ${mesaAtiva}?\nValor a cobrar: ${total}`);
+        document.getElementById('data-inicio').value = dataInicio;
+        document.getElementById('data-fim').value = dataFim;
+        
+        renderDashboard();
+    }
 
-            if(confirmacao) {
-                const btn = document.getElementById('btn-fechar'); btn.disabled = true; btn.innerText = "Fechando...";
-                try {
-                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "fechar_conta", mesa: mesaAtiva }) });
-                    delete mesas[mesaAtiva]; salvarMesas(); mesaAtiva = ""; document.getElementById('ms').value = ""; document.getElementById('cli').value = "";
-                    atualizarUI(); mostrarMensagem("💰 Conta fechada e faturamento registado!", "success");
-                } catch (error) { mostrarMensagem("Erro ao fechar a conta.", "error"); } 
-                finally { btn.disabled = false; btn.innerText = "Cobrar"; }
+    function fecharDashboard() { document.getElementById('dashboard-modal').style.display = 'none'; }
+
+    function renderDashboard() {
+        const strInicio = document.getElementById('data-inicio').value; 
+        const strFim = document.getElementById('data-fim').value; 
+
+        const dtInicio = strInicio ? new Date(strInicio + "T00:00:00") : null;
+        const dtFim = strFim ? new Date(strFim + "T23:59:59") : null;
+
+        let totalSoma = 0;
+        filtradosGlobais = [];
+        let diarioData = {};
+        let mensalData = {};
+        let idUnico = 0; // Criando um ID seguro para cada linha da tabela
+
+        historicoVendas.forEach(venda => {
+            const vendaData = parseDateData(venda.data);
+            let incluir = true;
+            
+            if (dtInicio && vendaData < dtInicio) incluir = false;
+            if (dtFim && vendaData > dtFim) incluir = false;
+
+            if (incluir) {
+                venda.idTabela = idUnico++; // Salva o ID diretamente na venda
+                filtradosGlobais.push(venda);
+                let valor = parseFloat(venda.valor);
+                totalSoma += valor;
+
+                let diaString = venda.data.split(' ')[0]; 
+                diarioData[diaString] = (diarioData[diaString] || 0) + valor;
+
+                let mesString = diaString.substring(3); 
+                mensalData[mesString] = (mensalData[mesString] || 0) + valor;
             }
+        });
+
+        document.getElementById('dash-total-periodo').innerText = totalSoma.toFixed(2).replace('.', ',') + '€';
+        document.getElementById('dash-qtd-mesas').innerText = filtradosGlobais.length;
+
+        const tbody = document.getElementById('dash-tabela-corpo');
+        if(filtradosGlobais.length === 0){
+            tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-zinc-500 italic">Nenhum registo encontrado.</td></tr>`;
+        } else {
+            // Agora usamos o ID (v.idTabela) no botão em vez de passar uma string gigantesca que quebra o HTML
+            tbody.innerHTML = filtradosGlobais.slice().reverse().map(v => `
+                <tr class="border-b border-zinc-800 hover:bg-zinc-800/50 transition">
+                    <td class="py-3 text-zinc-300">${v.data}</td>
+                    <td class="py-3 font-bold text-white">Mesa ${v.mesa}</td>
+                    <td class="py-3 text-right text-green-400 font-bold">${parseFloat(v.valor).toFixed(2).replace('.', ',')}€</td>
+                    <td class="py-3 text-center">
+                        <button onclick="reimprimirCupomDashboard(${v.idTabela})" class="bg-zinc-700 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition shadow" title="Imprimir 2ª Via">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        async function excluirMesa() {
-            if(!mesaAtiva || !mesas[mesaAtiva]) return mostrarMensagem("Nenhuma mesa selecionada.", "warning");
-            const confirmacao = confirm(`⚠️ TEM A CERTEZA?\nDeseja cancelar e EXCLUIR a Mesa ${mesaAtiva}?\nIsto removerá o pedido da cozinha e não cobrará nada.`);
-            if(confirmacao) {
-                const btn = document.getElementById('btn-excluir'); btn.disabled = true; btn.innerText = "...";
-                try {
-                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "cancelar_mesa", mesa: mesaAtiva }) });
-                    delete mesas[mesaAtiva]; salvarMesas(); mesaAtiva = ""; document.getElementById('ms').value = ""; document.getElementById('cli').value = "";
-                    atualizarUI(); mostrarMensagem("🗑️ Mesa excluída e pedido cancelado!", "success");
-                } catch (error) { mostrarMensagem("Erro ao excluir a mesa.", "error"); } 
-                finally { btn.disabled = false; btn.innerText = "Excluir"; }
+        desenharGraficos(diarioData, mensalData);
+    }
+
+    // A função de imprimir agora apenas recebe o ID e procura os dados na memória limpos!
+    function reimprimirCupomDashboard(idTabela) {
+        const venda = filtradosGlobais.find(v => v.idTabela === idTabela);
+        if (!venda) return;
+
+        let itens = [];
+        try {
+            itens = JSON.parse(venda.itens);
+        } catch(e) {}
+        
+        let layout = `
+==============================
+     BRASA DE MIRAFLORES
+       CUPOM (2ª VIA)
+==============================
+MESA: ${venda.mesa}
+DATA/HORA: ${venda.data}
+------------------------------
+ITENS CONSUMIDOS:
+${itens.map(i => {
+    if(i.cancelado) return ''; 
+    return `- 1x ${i.nome}`;
+}).filter(i => i !== '').join('\n')}
+${itens.length === 0 ? '(Nenhum item salvo - Venda Antiga)' : ''}
+------------------------------
+TOTAL A PAGAR: ${parseFloat(venda.valor).toFixed(2)} EUR
+==============================`;
+        
+        const win = window.open('', '', 'width=300,height=600');
+        win.document.write(`<pre style="font-family: monospace; font-size: 14px; padding:20px;">${layout}</pre>`);
+        win.print();
+        win.close();
+    }
+
+    function baixarRelatorio() {
+        if(filtradosGlobais.length === 0) {
+            alert("Não há dados para exportar neste período.");
+            return;
+        }
+
+        let csv = "DATA;MESA;VALOR(EUR)\n";
+        filtradosGlobais.forEach(v => {
+            csv += `${v.data};Mesa ${v.mesa};${parseFloat(v.valor).toFixed(2).replace('.', ',')}\n`;
+        });
+
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        
+        const dtInicio = document.getElementById('data-inicio').value;
+        const dtFim = document.getElementById('data-fim').value;
+        link.download = `Relatorio_Faturamento_${dtInicio}_A_${dtFim}.csv`;
+        
+        link.click();
+    }
+
+    function desenharGraficos(diarioData, mensalData) {
+        if (barChartInstance) barChartInstance.destroy();
+        if (pieChartInstance) pieChartInstance.destroy();
+
+        Chart.defaults.color = '#a1a1aa';
+        Chart.defaults.font.family = 'Roboto';
+
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        barChartInstance = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(diarioData),
+                datasets: [{ label: 'Vendas (€)', data: Object.values(diarioData), backgroundColor: '#3b82f6', borderRadius: 4 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { color: '#27272a' } }, x: { grid: { display: false } } }
             }
-        }
+        });
 
-        window.onload = render;
-    </script>
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        pieChartInstance = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(mensalData),
+                datasets: [{ data: Object.values(mensalData), backgroundColor: ['#22c55e', '#eab308', '#f97316', '#a855f7', '#ec4899', '#3b82f6'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    window.addEventListener('load', () => {
+        buscarPedidosDoServidor();
+        setInterval(buscarPedidosDoServidor, 8000); 
+    });
+</script>
 </body>
 </html>
