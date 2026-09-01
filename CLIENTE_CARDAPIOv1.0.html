@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ementa Brasa de Miraflores - Garçom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Oswald:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --branco-gelo: #f8f9fa; --vermelho-brasa: #bc0000; --marrom-escuro: #2c1e16; --verde-sucesso: #15803d; }
+        body { background-color: var(--branco-gelo); color: var(--marrom-escuro); font-family: 'Roboto', sans-serif; padding-bottom: 220px; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #1a1a1a; color: white; padding: 16px 24px; border-radius: 8px; border-left: 6px solid var(--vermelho-brasa); box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.5s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast.success { border-left-color: #2ecc71; }
+        .toast.error { border-left-color: #e74c3c; }
+        .toast.warning { border-left-color: #f1c40f; }
+        .word-flowers { display: inline-flex; position: relative; font-family: 'Cinzel', serif; }
+        .letter-container { position: relative; display: inline-block; }
+        .flower { position: absolute; width: 8px; height: 8px; background: #ffb7c5; border-radius: 50%; opacity: 0; pointer-events: none; z-index: 10; bottom: -2px; left: 50%; transform: translateX(-50%) scale(0); animation: bloom 4s infinite ease-in-out; }
+        .flower::before, .flower::after { content: ''; position: absolute; width: 100%; height: 100%; background: inherit; border-radius: inherit; }
+        .flower::before { transform: rotate(45deg); box-shadow: 10px 0 0 #ffb7c5, -10px 0 0 #ffb7c5; }
+        .flower::after { transform: rotate(-45deg); box-shadow: 0 10px 0 #ffb7c5, 0 -10px 0 #ffb7c5; }
+        @keyframes bloom { 0% { transform: translateX(-50%) scale(0) rotate(0deg); opacity: 0; } 20% { transform: translateX(-50%) scale(1.2) rotate(45deg); opacity: 0.8; } 40% { transform: translateX(-50%) scale(1) rotate(90deg); opacity: 0.9; } 60% { transform: translateX(-50%) scale(1) rotate(135deg); opacity: 0.9; } 80% { transform: translateX(-50%) scale(1.2) rotate(180deg); opacity: 0.8; } 100% { transform: translateX(-50%) scale(0) rotate(225deg); opacity: 0; } }
+        .f1 { left: -2px; bottom: 10px; animation-delay: 0.5s; background: #ff80ab; }
+        .f2 { left: 50%; bottom: -5px; animation-delay: 1.2s; }
+        .f3 { left: 100%; bottom: 15px; animation-delay: 2.5s; background: #f48fb1; }
+        .main-title { color: var(--vermelho-brasa); font-family: 'Cinzel', serif; letter-spacing: 2px; }
+        .category-title { color: var(--vermelho-brasa); font-family: 'Oswald', sans-serif; font-size: 1.7rem; margin-top: 35px; margin-bottom: 20px; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 15px; }
+        .category-title::after { content: ''; flex-grow: 1; height: 2px; background-color: #e2e8f0; }
+        .red-line { border-top: 2px solid var(--vermelho-brasa); width: 100%; margin: 10px 0; }
+        .item-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; padding: 14px 18px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s ease-in-out; position: relative; overflow: hidden; }
+        .item-container:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: var(--vermelho-brasa); }
+        .item-container::before { content: '+'; position: absolute; left: -30px; color: var(--vermelho-brasa); font-weight: bold; font-size: 1.2rem; transition: all 0.2s ease-in-out; }
+        .item-container:hover::before { left: 15px; }
+        .item-container:hover .item-name { transform: translateX(18px); }
+        .item-name { font-weight: 700; text-transform: uppercase; font-size: 0.95rem; transition: all 0.2s ease-in-out; }
+        .item-price { font-weight: 700; font-size: 1rem; color: var(--vermelho-brasa); }
+        .order-bar { background: rgba(255, 255, 255, 0.98); border-top: 1px solid #e2e8f0; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
+        .btn-cozinha { background-color: var(--vermelho-brasa); color: white; }
+        .btn-fechar { background-color: var(--marrom-escuro); color: white; }
+        .cart-tag { display: inline-flex; align-items: center; background: #ffffff; padding: 6px 12px; border-radius: 20px; margin: 4px; font-size: 12px; font-weight: 600; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .cart-tag.enviado { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+        .remove-x { color: #94a3b8; margin-left: 8px; cursor: pointer; font-size: 14px; font-weight: 900; }
+        .cart-tag:not(.enviado):hover { border-color: var(--vermelho-brasa); }
+        .cart-tag:not(.enviado):hover .remove-x { color: var(--vermelho-brasa); }
+        .cart-tag.enviado:hover .remove-x { color: #ef4444; }
+        .input-group input { border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .input-group input:focus { border-color: var(--vermelho-brasa); outline: none; }
+        .mesa-badge { padding: 4px 12px; background: #e2e8f0; color: #475569; border-radius: 12px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .mesa-badge.ativa { background: var(--vermelho-brasa); color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <header class="max-w-3xl mx-auto pt-10 px-6 text-center">
+        <h1 class="text-4xl md:text-5xl main-title font-bold mb-3">
+            <span class="word-flowers">
+                <span class="letter-container">B<div class="flower f1"></div></span>
+                <span class="letter-container">R<div class="flower f2"></div></span>
+                <span class="letter-container">A<div class="flower f3"></div></span>
+                <span class="letter-container">S<div class="flower f1"></div></span>
+                <span class="letter-container">A<div class="flower f2"></div></span>
+            </span> DE 
+            <span class="word-flowers">
+                <span class="letter-container">M<div class="flower f1"></div></span>
+                <span class="letter-container">I<div class="flower f2"></div></span>
+                <span class="letter-container">R<div class="flower f3"></div></span>
+                <span class="letter-container">A<div class="flower f1"></div></span>
+                <span class="letter-container">F<div class="flower f2"></div></span>
+                <span class="letter-container">L<div class="flower f3"></div></span>
+                <span class="letter-container">O<div class="flower f1"></div></span>
+                <span class="letter-container">R<div class="flower f2"></div></span>
+                <span class="letter-container">E<div class="flower f3"></div></span>
+                <span class="letter-container">S<div class="flower f1"></div></span>
+            </span>
+        </h1>
+        <div class="red-line"></div>
+        <p class="text-[13px] tracking-[0.3em] font-bold text-zinc-500 py-2 uppercase">Especialidades na Brasa desde 2004</p>
+        <div class="red-line"></div>
+    </header>
+
+    <section class="max-w-4xl mx-auto px-6 mt-6">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col md:flex-row gap-3">
+                <input type="number" id="ms" placeholder="Nº MESA" class="w-full md:w-1/3 p-3 rounded-lg uppercase text-sm font-bold bg-slate-50">
+                <input type="text" id="cli" placeholder="NOME DO CLIENTE (Opcional)" class="w-full md:w-2/3 p-3 rounded-lg uppercase text-sm font-bold bg-slate-50">
+                <button onclick="abrirMesa()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-lg font-bold text-sm transition-colors whitespace-nowrap">
+                    ABRIR MESA
+                </button>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2 items-center" id="mesas-abertas-container">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Mesas Abertas:</span>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-x-10 pb-10" id="main-menu"></main>
+
+    <div class="fixed bottom-0 left-0 right-0 p-4 order-bar z-50">
+        <div class="max-w-5xl mx-auto">
+            <div id="resumo-carrinho" class="flex flex-wrap gap-1 mb-3 max-h-24 overflow-y-auto p-1">
+                <span class="text-[11px] text-zinc-400 italic font-medium">Abra uma mesa para começar a registar itens.</span>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-center border-t border-slate-200 pt-3 gap-4">
+                <div class="text-center sm:text-left w-full sm:w-auto">
+                    <p class="text-[10px] text-zinc-400 uppercase font-bold tracking-widest mb-1">
+                        Mesa <span id="rodape-mesa" class="text-vermelho-brasa text-sm">-</span> | Total da Conta
+                    </p>
+                    <p id="total" class="text-3xl font-bold text-marrom-escuro">0,00€</p>
+                </div>
+                
+                <div class="flex w-full sm:w-auto gap-2">
+                    <button onclick="enviarCozinha()" id="btn-cozinha" class="btn-cozinha flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all flex items-center justify-center">
+                        Enviar
+                    </button>
+                    <button onclick="fecharConta()" id="btn-fechar" class="btn-fechar flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all">
+                        Cobrar
+                    </button>
+                    <button onclick="excluirMesa()" id="btn-excluir" class="bg-red-600 hover:bg-red-500 text-white flex-1 sm:flex-none px-4 py-3 rounded-lg font-bold uppercase text-xs hover:brightness-90 transition-all">
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx0Pe6FPM56dQE3axToTZWYnrCbIlG5-lTJS4QgcrlupRYFLmU0NlnfvyrRWaz4-s7z/exec"; 
+
+        function mostrarMensagem(texto, tipo = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            let icon = "🔥"; if(tipo === 'error') icon = "❌"; if(tipo === 'warning') icon = "⚠️";
+            toast.innerHTML = `<span>${icon}</span> <span>${texto}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.animation = "slideIn 0.5s ease reverse forwards"; setTimeout(() => toast.remove(), 500); }, 4000);
+        }
+
+        const ementa = [
+            { cat: "Entradas", colSpan: 2, itens: [
+                {n: "Sopa de Legumes", p: 1.80}, {n: "Chouriço Assado na Brasa", p: 4.50},
+                {n: "Croquetes de Carne", p: 3.00}, {n: "Pastéis de Bacalhau", p: 3.00},
+                {n: "Chamuças (2 Unid.)", p: 3.00}, {n: "Sticks de Mozarella (5 Unid.)", p: 3.50},
+                {n: "Nuggets de Frango (5 Unid.)", p: 3.00}, {n: "Aros de Cebola (10 Unid.)", p: 3.00}
+            ]},
+            { cat: "Peixe na Brasa", colSpan: 1, itens: [
+                {n: "Salmão", p: 12.00}, {n: "Dourada", p: 12.00},
+                {n: "Robalo", p: 12.00}, {n: "Peixe-Espada", p: 12.00},
+                {n: "Espetada Camarão c/ Abacaxi", p: 13.50}, {n: "Choco Frito", p: 9.50},
+                {n: "Sardinhas", p: 12.00}
+            ]},
+            { cat: "Carne na Brasa", colSpan: 1, itens: [
+                {n: "1/2 Frango da Guia", p: 8.00}, {n: "Mista da Casa", p: 9.00},
+                {n: "Entremeada", p: 8.00}, {n: "Lombo de Porco", p: 8.00},
+                {n: "1/2 Piano de Entrecosto", p: 9.00}, {n: "Espetada Mista", p: 9.00},
+                {n: "Espetada de Frango", p: 9.00}, {n: "Picanha c/s Alho", p: 9.50},
+                {n: "Secretos de Porco Preto", p: 9.50}, {n: "Costeleta de Novilho", p: 12.00},
+                {n: "Picanha da América do Sul", p: 13.50}, {n: "Salsichas", p: 8.00},
+                {n: "Alheira com Ovo", p: 8.00}, {n: "Bife de Perú", p: 8.50},
+                {n: "Panados de Perú", p: 8.50}, {n: "Alheira de Lamego c/Ovo", p: 8.50},
+                {n: "Espetada de Novilho", p: 12.00}, {n: "Hambúrguer no Prato", p: 9.00},
+                {n: "Bife de Novilho", p: 10.00}, {n: "Bife da Vazia", p: 12.00}
+            ]},
+            { cat: "Vegetariano", colSpan: 1, itens: [
+                {n: "Panado Vegan", p: 7.50}, {n: "Salsichas Vegan", p: 12.00},
+                {n: "Omelete", p: 7.50}, {n: "Hambúrguer Vegan no Prato", p: 8.50},
+                {n: "Arroz de Legumes", p: 8.00}
+            ]},
+            { cat: "No Pão", colSpan: 1, itens: [
+                {n: "Hambúrguer Clássico", p: 8.50}, {n: "Hambúrguer à Casa", p: 9.50},
+                {n: "Hambúrguer Egg", p: 10.00}, {n: "Bifana de Porco/Perú", p: 4.50},
+                {n: "Prego de Novilho", p: 5.50}
+            ]},
+            { cat: "Acompanhamentos", colSpan: 1, itens: [
+                {n: "Arroz Branco", p: 1.50}, {n: "Batata Frita", p: 2.70},
+                {n: "Feijão Preto", p: 2.00}, {n: "Ovo Estrelado", p: 1.00},
+                {n: "Legumes Cozidos", p: 3.50}, {n: "Salada Mista", p: 1.80},
+                {n: "Salada de Tomate", p: 2.00}, {n: "Salada Vinagrete", p: 2.00},
+                {n: "Brócolos Cozidos", p: 3.50}
+            ]},
+            { cat: "Sobremesas", colSpan: 1, itens: [
+                {n: "Pudim Flan", p: 2.50}, {n: "Doce da Casa", p: 2.50},
+                {n: "Mousse de Chocolate", p: 3.00}, {n: "Mousse de Oreo", p: 2.50},
+                {n: "Grom Gelato Italiano", p: 3.95}, {n: "Abacaxi", p: 3.00},
+                {n: "Melão", p: 3.00}, {n: "Manga", p: 3.50}, {n: "Bolo de Bolacha", p: 3.50},
+                {n: "Bolo Brigadeiro", p: 3.50}, {n: "Bolo de Coco", p: 3.50},
+                {n: "Cheesecake", p: 3.50}
+            ]}
+        ];
+
+        let mesas = JSON.parse(localStorage.getItem('brasa_mesas')) || {};
+        let mesaAtiva = "";
+
+        function salvarMesas() { localStorage.setItem('brasa_mesas', JSON.stringify(mesas)); renderizarMesasAbertas(); }
+
+        function render() {
+            const menu = document.getElementById('main-menu');
+            menu.innerHTML = ""; 
+            ementa.forEach(s => {
+                const colClass = s.colSpan === 2 ? 'md:col-span-2' : 'md:col-span-1';
+                const gridInterno = s.colSpan === 2 ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6' : '';
+                const section = document.createElement('div');
+                section.className = colClass;
+                section.innerHTML = `<h2 class="category-title">${s.cat}</h2><div class="${gridInterno} mb-4">${s.itens.map(i => `<div class="item-container" onclick="add('${i.n}', ${i.p})"><span class="item-name">${i.n}</span><span class="item-price">${i.p.toFixed(2).replace('.', ',')}€</span></div>`).join('')}</div>`;
+                menu.appendChild(section);
+            });
+            renderizarMesasAbertas();
+            atualizarUI();
+        }
+
+        function abrirMesa(numMesa = null) {
+            const inputNum = document.getElementById('ms');
+            const inputCli = document.getElementById('cli');
+            let ms = numMesa; let isManualClick = false;
+
+            if (!ms) { ms = inputNum.value.trim(); isManualClick = true; }
+            if(!ms) return mostrarMensagem("Introduza o nº da mesa.", "warning");
+
+            if (mesas[ms]) {
+                const novoNome = inputCli.value.trim();
+                const nomeAtual = mesas[ms].cliente || "";
+                if (isManualClick && novoNome !== "" && novoNome !== nomeAtual) {
+                    const querMudar = confirm(`⚠️ A Mesa ${ms} já está registada como "${nomeAtual || 'Sem Nome'}".\nTem certeza que quer trocar o nome para "${novoNome}"?`);
+                    if (querMudar) { mesas[ms].cliente = novoNome; mostrarMensagem(`Nome da Mesa ${ms} atualizado!`, "success"); }
+                } else if (!isManualClick) { mostrarMensagem(`Mesa ${ms} selecionada!`, "success"); }
+                inputNum.value = ms; inputCli.value = mesas[ms].cliente || "";
+            } else {
+                const cli = inputCli.value.trim(); mesas[ms] = { cliente: cli, itens: [] }; inputNum.value = ms;
+                mostrarMensagem(`✅ Mesa ${ms} nova criada!`, "success");
+            }
+            mesaAtiva = ms; salvarMesas(); atualizarUI();
+        }
+
+        function renderizarMesasAbertas() {
+            const container = document.getElementById('mesas-abertas-container');
+            const tit = `<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mesas Ativas:</span>`;
+            const chavesMesas = Object.keys(mesas);
+            if(chavesMesas.length === 0) { container.innerHTML = tit + `<span class="text-xs text-slate-300 italic">Nenhuma</span>`; return; }
+            const badges = chavesMesas.map(m => {
+                const nomeCli = mesas[m].cliente ? ` - ${mesas[m].cliente}` : '';
+                return `<div class="mesa-badge ${m === mesaAtiva ? 'ativa' : ''}" onclick="abrirMesa('${m}')">Mesa ${m}${nomeCli}</div>`;
+            }).join('');
+            container.innerHTML = tit + badges;
+        }
+
+        function add(n, p) {
+            if(!mesaAtiva) return mostrarMensagem("Por favor, abra uma mesa primeiro.", "warning");
+            mesas[mesaAtiva].itens.push({ id: Date.now() + Math.random(), n, p, enviado: false });
+            salvarMesas(); atualizarUI(); mostrarMensagem(`${n} adicionado!`, 'success');
+        }
+
+        async function removerItem(id) {
+            if(!mesaAtiva || !mesas[mesaAtiva]) return;
+            const item = mesas[mesaAtiva].itens.find(i => i.id === id);
+            if (!item) return;
+
+            if (item.enviado) {
+                const confirmacao = confirm(`⚠️ DESEJA REALMENTE EXCLUIR ESTE ITEM?\n\nItem: ${item.n}\nValor: ${item.p.toFixed(2)}€\n\nIsso irá atualizar o pedido e avisar a cozinha.`);
+                if (!confirmacao) return;
+
+                try {
+                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "remover_item", mesa: mesaAtiva, item_id: id }) });
+                    mesas[mesaAtiva].itens = mesas[mesaAtiva].itens.filter(i => i.id !== id);
+                    salvarMesas(); atualizarUI(); mostrarMensagem(`🗑️ Item cancelado com sucesso!`, "success");
+                } catch (error) { mostrarMensagem("Erro ao cancelar item no servidor.", "error"); }
+            } else {
+                mesas[mesaAtiva].itens = mesas[mesaAtiva].itens.filter(i => i.id !== id);
+                salvarMesas(); atualizarUI();
+            }
+        }
+
+        function atualizarUI() {
+            const resumo = document.getElementById('resumo-carrinho'); const rodapeMesa = document.getElementById('rodape-mesa'); const totalE = document.getElementById('total');
+            if(!mesaAtiva || !mesas[mesaAtiva]) { resumo.innerHTML = '<span class="text-[11px] text-zinc-400 italic font-medium">Selecione uma mesa.</span>'; rodapeMesa.innerText = "-"; totalE.innerText = "0,00€"; return; }
+            const mesa = mesas[mesaAtiva]; rodapeMesa.innerText = mesaAtiva;
+            const totalVal = mesa.itens.reduce((acc, curr) => acc + curr.p, 0); totalE.innerText = totalVal.toFixed(2).replace('.', ',') + "€";
+            
+            if(mesa.itens.length === 0) { resumo.innerHTML = '<span class="text-[11px] text-zinc-400 italic font-medium">Mesa vazia.</span>'; } 
+            else {
+                resumo.innerHTML = mesa.itens.map(item => {
+                    if(item.enviado) { return `<div class="cart-tag enviado">${item.n} <span class="ml-1 text-verde-sucesso">✓</span> <span class="remove-x ml-1" title="Excluir Item" onclick="removerItem(${item.id})">✖</span></div>`; } 
+                    else { return `<div class="cart-tag">${item.n} <span class="remove-x" title="Remover" onclick="removerItem(${item.id})">✖</span></div>`; }
+                }).join('');
+            }
+        }
+
+        async function enviarCozinha() {
+            if(!mesaAtiva || !mesas[mesaAtiva]) return mostrarMensagem("Nenhuma mesa aberta.", "warning");
+            const mesa = mesas[mesaAtiva]; const itensNaoEnviados = mesa.itens.filter(i => !i.enviado);
+            if(itensNaoEnviados.length === 0) return mostrarMensagem("Não há itens novos para enviar à cozinha.", "warning");
+
+            const btn = document.getElementById('btn-cozinha'); btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+
+            const dadosPedido = { action: "adicionar", cliente: mesa.cliente, mesa: mesaAtiva, itens: itensNaoEnviados.map(i => ({ id: i.id, nome: i.n, preco: i.p })), total: itensNaoEnviados.reduce((acc, curr) => acc + curr.p, 0) };
+
+            try {
+                await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(dadosPedido) });
+                mesa.itens.forEach(i => i.enviado = true); salvarMesas(); atualizarUI(); mostrarMensagem("🔥 ITENS ENVIADOS PARA A COZINHA!", "success");
+            } catch (error) { mostrarMensagem("Erro de conexão.", "error"); } 
+            finally { btn.disabled = false; btn.innerHTML = "Enviar"; }
+        }
+
+        async function fecharConta() {
+            if(!mesaAtiva || !mesas[mesaAtiva]) return;
+            const total = document.getElementById('total').innerText;
+            const confirmacao = confirm(`Deseja FECHAR A CONTA da Mesa ${mesaAtiva}?\nValor a cobrar: ${total}`);
+
+            if(confirmacao) {
+                const btn = document.getElementById('btn-fechar'); btn.disabled = true; btn.innerText = "Fechando...";
+                try {
+                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "fechar_conta", mesa: mesaAtiva }) });
+                    delete mesas[mesaAtiva]; salvarMesas(); mesaAtiva = ""; document.getElementById('ms').value = ""; document.getElementById('cli').value = "";
+                    atualizarUI(); mostrarMensagem("💰 Conta fechada e faturamento registado!", "success");
+                } catch (error) { mostrarMensagem("Erro ao fechar a conta.", "error"); } 
+                finally { btn.disabled = false; btn.innerText = "Cobrar"; }
+            }
+        }
+
+        async function excluirMesa() {
+            if(!mesaAtiva || !mesas[mesaAtiva]) return mostrarMensagem("Nenhuma mesa selecionada.", "warning");
+            const confirmacao = confirm(`⚠️ TEM A CERTEZA?\nDeseja cancelar e EXCLUIR a Mesa ${mesaAtiva}?\nIsto removerá o pedido da cozinha e não cobrará nada.`);
+            if(confirmacao) {
+                const btn = document.getElementById('btn-excluir'); btn.disabled = true; btn.innerText = "...";
+                try {
+                    await fetch(URL_APPS_SCRIPT, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: "cancelar_mesa", mesa: mesaAtiva }) });
+                    delete mesas[mesaAtiva]; salvarMesas(); mesaAtiva = ""; document.getElementById('ms').value = ""; document.getElementById('cli').value = "";
+                    atualizarUI(); mostrarMensagem("🗑️ Mesa excluída e pedido cancelado!", "success");
+                } catch (error) { mostrarMensagem("Erro ao excluir a mesa.", "error"); } 
+                finally { btn.disabled = false; btn.innerText = "Excluir"; }
+            }
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
